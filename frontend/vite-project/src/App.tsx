@@ -1,9 +1,9 @@
 import { Route, Routes, BrowserRouter as Router, Navigate } from 'react-router-dom';
 import Login from './pages/login';
 import Welcome from './pages/welcome';
-import CreateAccount from './pages/create-account';
-import WorkoutPage from './pages/workout-page';
-import CreateWorkout from './pages/create-workout';
+import CreateAccount from './pages/create--account';
+import WorkoutPage from './pages/workout--page';
+import CreateWorkout from './pages/create--workout';
 
 
 
