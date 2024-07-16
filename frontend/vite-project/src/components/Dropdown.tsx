@@ -63,12 +63,12 @@ export default function Dropdown(){
                     </option>
                 ))}
             </select>
-            <div className="max-h-40 overflow-y-auto mt-2">
+            <div className="max-h-[350px] overflow-y-auto mt-2">
                 <ul>
                     {selectedExercises.map((exercise, index) => (
-                        <li key={index} className="flex justify-between items-center">
+                        <li key={index} className="flex justify-between items-center text-lg text-gray-800 py-2 border-b border-gray-300">
                             {exercise}
-                            <button onClick={() => handleRemoveExercise(exercise)} className="submit w-2/12 ml-auto"><img src="../images/trash.webp" alt="trash" /></button>
+                            <button onClick={() => handleRemoveExercise(exercise)} className="submit xl:w-1/12 ml-auto"><img src="../images/trash.webp" alt="trash" /></button>
                         </li>
                     ))}
                 </ul>

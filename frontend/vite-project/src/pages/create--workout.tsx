@@ -22,7 +22,7 @@ export default function CreateWorkout() {
 
     return (
         <div className="background">
-            <div className="form">
+            <div className="form w-1/2 h-2/3" >
                 <input className='form--input'
                     type="text" 
                     placeholder="Workout Name"
