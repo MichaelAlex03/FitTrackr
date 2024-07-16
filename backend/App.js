@@ -19,9 +19,15 @@ db.connect();
 app.use(bodyParser.json());
 app.use(cors());
 
-app.get("/", (req, res) => {
-    res.send('Hello from the backend!');
-});
+
+
+app.get("/exercises", async (req, res) => {
+    const result = await db.query('SELECT * FROM exercises')
+    res.send(result.rows)
+    console.log(result.rows)
+})
+
+app.post('/workout')
 
 app.post('/login', async (req, res) => {
   const { email, password } = req.body
