@@ -24,9 +24,24 @@ export default function CreateAccount() {
     })
   }
 
+  async function checkEmailExists(email: string) {
+    try {
+      const response = await axios.get(`http://localhost:3000/check-email?email=${email}`);
+      return response.data.exists;
+    } catch (error) {
+      console.error('Error checking email:', error);
+      return false;
+    }
+  }
+
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     if (formData.password === formData.confirmPass) {
+      const emailExists = await checkEmailExists(formData.email);
+      if (emailExists) {
+        alert('Email already exists!');
+        return;
+      }
       console.log('Passwords match! Logged in');
       try {
         const response = await axios.post('http://localhost:3000/create-account', 

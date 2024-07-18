@@ -18,6 +18,12 @@
     .submit{
         @apply bg-brownish hover:bg-blue-600 text-gray-700 font-medium py-2 px-4 rounded w-full mb-2 ;
     }
+    .workouts{
+        @apply bg-brownish border-black border-2 rounded-md p-2 my-2 w-5/6;
+    }
+    .create-workout{
+        @apply xs:max-h-[150px] sm:max-h-[200px] md:max-h-[200px] lg:max-h-[200px] xl:max-h-[350px] overflow-y-auto mt-2
+    }
 }
 
 @layer utilities{
