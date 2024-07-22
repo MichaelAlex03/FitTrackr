@@ -21,6 +21,9 @@
     .workouts{
         @apply bg-brownish border-black border-2 rounded-md p-2 my-2 w-5/6;
     }
+    .delete{
+        @apply xs:w-1/5 sm:w-1/5 md:w-1/6 lg:w-1/6 xl:w-1/12
+    }
     .create-workout{
         @apply xs:max-h-[150px] sm:max-h-[200px] md:max-h-[200px] lg:max-h-[200px] xl:max-h-[350px] overflow-y-auto mt-2
     }

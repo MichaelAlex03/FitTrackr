@@ -4,6 +4,7 @@ import axios from 'axios';
 
 interface Workout {
     workout_name: string;
+    id: number;
 }
 
 export default function WorkoutPage() {
@@ -18,7 +19,11 @@ export default function WorkoutPage() {
     useEffect(() => {
         const fetchWorkouts = async () => {
             try {
-                const response = await axios.get('http://localhost:3000/workouts');
+                const response = await axios.get('http://localhost:3000/workouts', {
+                    headers: {
+                      "x-access-token": localStorage.getItem("token")
+                    }
+                  });
                 setWorkouts(response.data);
             } catch (error) {
                 console.error('Error fetching workouts:', error);
@@ -35,9 +40,9 @@ export default function WorkoutPage() {
             <div className="relative content">
                 <h1 className="absolute top-5 left-5 text-2xl font-bold">My Workouts</h1>
                 <button className=" absolute submit top-24 w-5/6" onClick={navigateToCreateWorkout}>Create a new workout</button>
-                <div className="flex flex-col items-center mt-8 w-full">
+                <div className="flex flex-col items-center mt-24 w-full overflow-y-auto max-h-[450px]">
                 {workouts.map((workout) => (
-                        <button className="workouts">{workout.workout_name}</button>
+                        <button key={workout.id} className="workouts">{workout.workout_name}</button>
                     ))}
                 </div>
             </div>

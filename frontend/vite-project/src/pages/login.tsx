@@ -9,6 +9,8 @@ export default function Login() {
     password: "",
   })
 
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     const {name, value} = e.target
     setFormData(prevFormData => {
@@ -24,10 +26,13 @@ export default function Login() {
     e.preventDefault();
     try{
       const response = await axios.post('http://localhost:3000/login', formData);
-      console.log(response.data.success)
-      if (response.data.success) {
+      console.log(response.data)
+      if (response.data.auth) {
+        setIsLoggedIn(true);
+        localStorage.setItem('token', response.data.token)
         navigateToWorkout();
       } else {
+        setIsLoggedIn(false);
         alert(response.data.message);
       }
     }catch(error){
@@ -66,6 +71,7 @@ return (
           </button>
         </div>  
       </form>
+      {isLoggedIn && <button>Checked if authenticated</button>}
     </div>
   )
 }

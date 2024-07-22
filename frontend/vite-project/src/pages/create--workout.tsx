@@ -1,20 +1,26 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { jwtDecode } from 'jwt-decode';
 
 interface Exercise {
     id: number;
     exercise_name: string;
 }
 
-
 export default function CreateWorkout() {
 
+    const navigate = useNavigate();
     const [workoutName, setWorkoutName] = useState('');
 
     const [isOpen, setIsOpen] = useState(false);
     const [exercises, setExercises] = useState<Exercise[]>([]);
     const [selectedExercise, setSelectedExercise] = useState<string>('');
     const [selectedExercises, setSelectedExercises] = useState<string[]>([]);
+
+    const navigateToWorkoutPage = () => {
+        navigate('/workout');
+    };
 
     useEffect(() => {
         const fetchExercises = async () => {
@@ -56,13 +62,30 @@ export default function CreateWorkout() {
 
     async function handleCreateWorkout(){
         try {
-            const response = await axios.post('http://localhost:3000/workouts', {workout_name: workoutName, exercises: selectedExercises});
+            const token = localStorage.getItem("token")
+            if(!token){
+                return;
+            }
+
+            const decodedToken: any = jwtDecode(token);
+            const userId = decodedToken.user_id;
+
+            const response = await axios.post('http://localhost:3000/workouts', {
+                workout_name: workoutName, 
+                exercises: selectedExercises, 
+                user_id: userId
+            });
+            if(response.data.success){
+                navigateToWorkoutPage();
+            }else{
+                console.log('Error creating workout');
+            }
             console.log(response)
         } catch (error) {
-            console.error('Error fetching exercises:', error);
+            console.error('Error creating workout:', error);
         }
     }
-    
+
 
     return (
         <div className="background">
@@ -96,14 +119,14 @@ export default function CreateWorkout() {
                     {selectedExercises.map((exercise, index) => (
                         <li key={index} className="flex justify-between items-center text-lg text-gray-800 py-2 border-b border-gray-300">
                             {exercise}
-                            <button onClick={() => handleRemoveExercise(exercise)} className="submit lg: w-1/6 xl:w-1/12"><img src="../images/trash.webp" alt="trash"/></button>
+                            <button onClick={() => handleRemoveExercise(exercise)} className="submit delete"><img src="../images/trash.webp" alt="trash"/></button>
                         </li>
                     ))}
                         </ul>
                     </div>
                     <button className="submit bg-gray-300" onClick={handleAddExercise}>Add</button>
                 </div>
-                <button className="submit" onSubmit={handleCreateWorkout}>Create Workout</button>
+                <button className="submit" onClick={handleCreateWorkout}>Create Workout</button>
             </div>
         </div>
     )
