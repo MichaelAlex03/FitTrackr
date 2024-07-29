@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { jwtDecode } from 'jwt-decode';
 
 interface Exercise {
     id: number;
@@ -60,6 +59,8 @@ export default function CreateWorkout() {
         setWorkoutName(value)
       }
 
+    console.log(selectedExercises)
+
     async function handleCreateWorkout(){
         try {
             const token = localStorage.getItem("token")
@@ -67,25 +68,47 @@ export default function CreateWorkout() {
                 return;
             }
 
-            const decodedToken: any = jwtDecode(token);
-            const userId = decodedToken.user_id;
-
-            const response = await axios.post('http://localhost:3000/workouts', {
+            const workoutResponse = await axios.post('http://localhost:3000/workouts', {
                 workout_name: workoutName, 
-                exercises: selectedExercises, 
-                user_id: userId
+            }, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
             });
-            if(response.data.success){
-                navigateToWorkoutPage();
+            if(workoutResponse.data.success){
+                const workout_id = workoutResponse.data.workout_id;
+
+                const exercisesData = selectedExercises.map(exercise => ({
+                    workout_id: workout_id,
+                    exercise_name: exercise,
+                    reps: 0,
+                    sets: 1,
+                    weight: 0
+                }));
+
+                console.log(exercisesData);
+                const exercisesResponse = await axios.post('http://localhost:3000/create_exercises', {
+                    exercises: exercisesData
+                } , {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                if(exercisesResponse.data.success){
+                    navigateToWorkoutPage();
+                }else{
+                    console.log('Error adding exercises to user_exercises table');
+                }
             }else{
                 console.log('Error creating workout');
             }
-            console.log(response)
+            console.log(workoutResponse)
         } catch (error) {
             console.error('Error creating workout:', error);
         }
     }
 
+    console.log(selectedExercises)
 
     return (
         <div className="background">

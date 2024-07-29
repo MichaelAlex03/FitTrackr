@@ -21,10 +21,10 @@ app.use(bodyParser.json());
 app.use(cors());
 
 const verifyJWT = (req, res, next) => {
-  const token = req.headers["x-access-token"]
+  const token = req.headers["authorization"]?.split(' ')[1];
 
   if(!token){
-    res.send("Yo we need a token, please give it to us next time")
+    res.send("Token is required")
   } else{
     jwt.verify(token, "secret", (err, decoded) => {
       if(err){
@@ -37,20 +37,23 @@ const verifyJWT = (req, res, next) => {
   }
 }
 
-// app.get("/isUserAuth", verifyJWT , (req, res) => {
-//   res.send("Yo you are authenticated")
-// })
-
 app.get("/exercises", async (req, res) => {
     const result = await db.query('SELECT * FROM exercises')
     res.send(result.rows)
     console.log(result.rows)
 })
 
+app.get("/user_exercises/:id", verifyJWT, async (req, res) => {
+  const workout_id = req.params.id;
+  const result = await db.query('SELECT * FROM user_exercises WHERE workout_id = $1', [workout_id])
+  res.send(result.rows)
+})
+
 app.get("/workouts", verifyJWT, async(req, res) => {
-    const result = await db.query('SELECT * FROM workouts')
-    res.send(result.rows)
-    console.log(result.rows)
+  const userId = req.userId;
+  const result = await db.query('SELECT * FROM workouts WHERE user_id = $1', [userId])
+  res.send(result.rows)
+  console.log(result.rows)
 })
 
 app.get("/check-email", async (req, res) => {
@@ -64,9 +67,30 @@ app.get("/check-email", async (req, res) => {
   }
 })
 
-app.post("/workouts", async (req, res) => {
-  const result = await db.query('INSERT INTO workouts (workout_name, user_id) VALUES ($1, $2)', [req.body.workout_name, req.body.user_id]);
-  res.send({success: true})
+app.post("/workouts", verifyJWT, async (req, res) => {
+  try{
+    const userId = req.userId;
+    const result = await db.query('INSERT INTO workouts (workout_name, user_id) VALUES ($1, $2) RETURNING id', [req.body.workout_name, userId]);
+    res.send({success: true, user_id: userId, workout_id: result.rows[0].id})
+  } catch (error) {
+    console.error('Error inserting workout:', error);
+    res.status(500).send({ success: false, message: 'Internal Server Error' });
+  }
+})
+
+app.post("/create_exercises", verifyJWT, async (req, res) => {
+  const {exercises } = req.body;
+  try{
+    const insertExercises = exercises.map(exercise => {
+      const { workout_id, exercise_name, reps, sets, weight } = exercise;
+      db.query('INSERT INTO user_exercises (exercise_name, exercise_sets, exercise_reps, workout_id, exercise_weight) VALUES ($1, $2, $3, $4, $5)', 
+      [exercise_name, sets,  reps, workout_id, weight]);
+    })
+    res.send({success: true})
+  } catch(error){
+    console.error('Error inserting exercise:', error);
+    res.status(500).send({ success: false, message: 'Internal Server Error' });
+  }
 })
 
 

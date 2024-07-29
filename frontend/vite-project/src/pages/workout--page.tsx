@@ -16,12 +16,16 @@ export default function WorkoutPage() {
         navigate('/create-workout');
     };
 
+    const navigateToWorkoutView = (id:number) => {
+        navigate(`/workout--view/${id}`);
+    };
+
     useEffect(() => {
         const fetchWorkouts = async () => {
             try {
                 const response = await axios.get('http://localhost:3000/workouts', {
                     headers: {
-                      "x-access-token": localStorage.getItem("token")
+                      'Authorization': `Bearer ${localStorage.getItem("token")}`
                     }
                   });
                 setWorkouts(response.data);
@@ -33,6 +37,8 @@ export default function WorkoutPage() {
         fetchWorkouts();
     }, []);
 
+
+
     console.log(workouts)
 
     return (
@@ -42,7 +48,7 @@ export default function WorkoutPage() {
                 <button className=" absolute submit top-24 w-5/6" onClick={navigateToCreateWorkout}>Create a new workout</button>
                 <div className="flex flex-col items-center mt-24 w-full overflow-y-auto max-h-[450px]">
                 {workouts.map((workout) => (
-                        <button key={workout.id} className="workouts">{workout.workout_name}</button>
+                        <button key={workout.id} className="workouts" onClick={() => navigateToWorkoutView(workout.id)}>{workout.workout_name}</button>
                     ))}
                 </div>
             </div>

@@ -4,6 +4,7 @@ import Welcome from './pages/welcome';
 import CreateAccount from './pages/create--account';
 import WorkoutPage from './pages/workout--page';
 import CreateWorkout from './pages/create--workout';
+import WorkoutView from './pages/workout--view';
 
 
 
@@ -17,6 +18,7 @@ function App() {
         <Route path="/create-account" element={<div><CreateAccount /></div>} />
         <Route path="/workout" element={<div><WorkoutPage /></div>} />
         <Route path="/create-workout" element={<div><CreateWorkout /></div>} />
+        <Route path="/workout--view/:id" element={<div><WorkoutView /></div>} />
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </Router>
