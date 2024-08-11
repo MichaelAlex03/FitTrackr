@@ -67,11 +67,47 @@ app.get("/check-email", async (req, res) => {
   }
 })
 
+app.get("/sets", verifyJWT, async (req, res) => {
+  try{
+    const result = await db.query('SELECT * FROM workout_sets WHERE workout_id = $1', [req.params.id]);
+    res.send({rows: result.rows, success: true})
+  }catch (error) {
+    console.error('Error getting set data:', error);
+    res.status(500).send({ success: false, message: 'Internal Server Error' });
+  }
+})
+
+// app.post("/user_workouts/:id", verifyJWT, async (req, res) => {
+//   const workout_id = req.params.id
+//   const {exercises } = req.body;
+//   try{
+//     const insertExercises = exercises.map(exercise => {
+//       const { reps, weight } = exercise;
+//       db.query('INSERT INTO user_exercises (exercise_reps, exercise_weight, workout_id) VALUES ($1, $2, $3),'
+//       [reps, weight, workout_id]);
+//     })
+//     res.send({success: true});
+//   }catch(error){
+//     console.error('Error posting data:', error);
+//     res.status(500).send({ success: false, message: 'Internal Server Error' });
+//   }
+// })
+
+app.post("/create_sets", verifyJWT, async (req, res) => {
+  try{
+      db.query('INSERT INTO workout_sets (exercise_id, exercise_reps, exercise_weight, workout_id) VALUES ($1, $2, $3, $4)', 
+        [req.body.exercise_id, req.body.reps, req.body.weight, req.body.workout_id]);
+  } catch(error){
+    console.error('Error inserting set', error);
+    res.status(500).send({ success: false, message: 'Internal Server Error' });
+  }
+})
+
 app.post("/workouts", verifyJWT, async (req, res) => {
   try{
     const userId = req.userId;
     const result = await db.query('INSERT INTO workouts (workout_name, user_id) VALUES ($1, $2) RETURNING id', [req.body.workout_name, userId]);
-    res.send({success: true, user_id: userId, workout_id: result.rows[0].id})
+    res.send({success: true, user_id: userId, workout_id: result.rows[0].id});
   } catch (error) {
     console.error('Error inserting workout:', error);
     res.status(500).send({ success: false, message: 'Internal Server Error' });
@@ -82,9 +118,9 @@ app.post("/create_exercises", verifyJWT, async (req, res) => {
   const {exercises } = req.body;
   try{
     const insertExercises = exercises.map(exercise => {
-      const { workout_id, exercise_name, reps, sets, weight } = exercise;
-      db.query('INSERT INTO user_exercises (exercise_name, exercise_sets, exercise_reps, workout_id, exercise_weight) VALUES ($1, $2, $3, $4, $5)', 
-      [exercise_name, sets,  reps, workout_id, weight]);
+      const { workout_id, exercise_name, sets } = exercise;
+      db.query('INSERT INTO user_exercises ( exercise_name, workout_id, workout_sets) VALUES ($1, $2, $3)', 
+      [exercise_name, workout_id, sets]);
     })
     res.send({success: true})
   } catch(error){

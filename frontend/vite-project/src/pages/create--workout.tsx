@@ -81,9 +81,7 @@ export default function CreateWorkout() {
                 const exercisesData = selectedExercises.map(exercise => ({
                     workout_id: workout_id,
                     exercise_name: exercise,
-                    reps: 0,
-                    sets: 1,
-                    weight: 0
+                    sets: 0
                 }));
 
                 console.log(exercisesData);
