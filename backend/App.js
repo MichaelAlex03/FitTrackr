@@ -45,8 +45,8 @@ app.get("/exercises", async (req, res) => {
 
 app.get("/user_exercises/:id", verifyJWT, async (req, res) => {
   const workout_id = req.params.id;
-  const result = await db.query('SELECT * FROM user_exercises WHERE workout_id = $1', [workout_id])
-  res.send(result.rows)
+  const result = await db.query('SELECT * FROM user_exercises WHERE workout_id = $1', [workout_id]);
+  res.send({rows: result.rows, success: true});
 })
 
 app.get("/workouts", verifyJWT, async(req, res) => {
@@ -67,7 +67,7 @@ app.get("/check-email", async (req, res) => {
   }
 })
 
-app.get("/sets", verifyJWT, async (req, res) => {
+app.get("/sets/:id", verifyJWT, async (req, res) => {
   try{
     const result = await db.query('SELECT * FROM workout_sets WHERE workout_id = $1', [req.params.id]);
     res.send({rows: result.rows, success: true})
@@ -184,6 +184,39 @@ app.post('/create-account', async (req, res) => {
       res.status(500).send({ success: false, message: 'Internal Server Error' });
   }
 });
+
+app.delete('/workout_sets/:id', async (req, res) => {
+  const workout_id = req.params.id;
+  try{
+    await db.query('DELETE FROM workout_sets WHERE workout_id = $1' , [workout_id]);
+    res.status(200).send({success: true, message: 'sets deleted'});
+  }catch(error){
+    console.error('Error inserting user:', error);
+    res.status(500).send({ success: false, message: 'Internal Server Error' });
+  }
+})
+
+app.delete('/workout_exercises/:id', async (req, res) => {
+  const workout_id = req.params.id;
+  try{
+    await db.query('DELETE FROM user_exercises WHERE workout_id = $1' , [workout_id]);
+    res.status(200).send({success: true, message: 'exercises deleted'});
+  }catch(error){
+    console.error('Error inserting user:', error);
+    res.status(500).send({ success: false, message: 'Internal Server Error' });
+  }
+})
+
+app.delete('/workouts/:id', async (req, res) => {
+  const workout_id = req.params.id;
+  try{
+    await db.query('DELETE FROM workouts WHERE id = $1' , [workout_id]);
+    res.status(200).send({success: true, message: 'workouts deleted'});
+  }catch(error){
+    console.error('Error inserting user:', error);
+    res.status(500).send({ success: false, message: 'Internal Server Error' });
+  }
+})
 
 app.listen(port, () => {
     console.log(`Server running on http://localhost:${port}`);

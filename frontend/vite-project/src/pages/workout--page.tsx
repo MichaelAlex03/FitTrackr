@@ -37,6 +37,30 @@ export default function WorkoutPage() {
         fetchWorkouts();
     }, []);
 
+    async function removeWorkout(workoutToRemove: Workout) {
+        setWorkouts(workouts.filter(workout => workout !== workoutToRemove));
+
+        console.log(workoutToRemove.id);
+        try{
+            const deleteSets = await axios.delete(`http://localhost:3000/workout_sets/${workoutToRemove.id}`);
+            console.log(deleteSets.data);
+            if(deleteSets.data.success){
+                const deleteExercises = await axios.delete(`http://localhost:3000/workout_exercises/${workoutToRemove.id}`);
+                console.log(deleteExercises.data)
+                if(deleteExercises.data.success){
+                    const deleteWorkout = await axios.delete(`http://localhost:3000/workouts/${workoutToRemove.id}`);
+                    console.log(deleteWorkout.data)
+                }
+            } else {
+                console.log("could not delete sets");
+            }
+        }
+        catch (error) {
+            console.error('Error deleting workout:', error);
+        }
+
+    }
+
 
 
     console.log(workouts)
@@ -48,7 +72,10 @@ export default function WorkoutPage() {
                 <button className=" absolute submit top-24 w-5/6" onClick={navigateToCreateWorkout}>Create a new workout</button>
                 <div className="flex flex-col items-center mt-24 w-full overflow-y-auto max-h-[450px]">
                 {workouts.map((workout) => (
-                        <button key={workout.id} className="workouts" onClick={() => navigateToWorkoutView(workout.id)}>{workout.workout_name}</button>
+                        <div>
+                            <button key={workout.id} className="workouts" onClick={() => navigateToWorkoutView(workout.id)}>{workout.workout_name}</button>
+                            <button key={workout.workout_name} onClick={() => removeWorkout(workout)} className="submit delete"><img src="../images/trash.webp" alt="trash"/></button>
+                        </div>
                     ))}
                 </div>
             </div>

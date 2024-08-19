@@ -16,7 +16,7 @@ export default function WorkoutView() {
 
     const { id } = useParams<{ id: string }>();
     const [exercises, setExercises] = useState<Exercise[]>([]);
-    const [exerciseData, setExerciseData] = useState<Exercise[]>([]);
+    const [exerciseSets, setExerciseSets] = useState<Exercise[]>([]);
 
     useEffect(() => {
         const fetchExercises = async () => {
@@ -32,15 +32,15 @@ export default function WorkoutView() {
                 });
                 if(response.data.success)
                 {
-                    const setsData = await axios.get(`http://localhost:3000/sets${id}`, {
+                    const setsData = await axios.get(`http://localhost:3000/sets/${id}`, {
                         headers: {
                             'Authorization': `Bearer ${token}`
                         }
                     });
-                    setExerciseData(setsData.data.rows);
+                    setExerciseSets(setsData.data.rows);
                     console.log(setsData);
                 }
-                setExercises(response.data);
+                setExercises(response.data.rows);
             } catch (error) {
                 console.error('Error fetching exercises:', error);
             }
