@@ -30,7 +30,9 @@ const verifyJWT = (req, res, next) => {
       if(err){
         res.json({auth: false, message: "You failed to authenticate"})
       } else{
-        req.userId = decoded.id
+        req.userId = decoded.userId
+        console.log("Verified JWT: userId =", req.userId); // Add this line for debugging
+        console.log(req.userId);
         next()
       }
     })
@@ -39,20 +41,21 @@ const verifyJWT = (req, res, next) => {
 
 app.get("/exercises", async (req, res) => {
     const result = await db.query('SELECT * FROM exercises')
-    res.send(result.rows)
+    res.json(result.rows)
     console.log(result.rows)
 })
 
 app.get("/user_exercises/:id", verifyJWT, async (req, res) => {
   const workout_id = req.params.id;
   const result = await db.query('SELECT * FROM user_exercises WHERE workout_id = $1', [workout_id]);
-  res.send({rows: result.rows, success: true});
+  res.json({rows: result.rows, success: true});
 })
 
 app.get("/workouts", verifyJWT, async(req, res) => {
   const userId = req.userId;
+  console.log("Fetching workouts for userId:", userId);
   const result = await db.query('SELECT * FROM workouts WHERE user_id = $1', [userId])
-  res.send(result.rows)
+  res.json(result.rows)
   console.log(result.rows)
 })
 
@@ -70,7 +73,8 @@ app.get("/check-email", async (req, res) => {
 app.get("/sets/:id", verifyJWT, async (req, res) => {
   try{
     const result = await db.query('SELECT * FROM workout_sets WHERE workout_id = $1', [req.params.id]);
-    res.send({rows: result.rows, success: true})
+    console.log("sets: " + JSON.stringify(result.rows));
+    res.json({rows: result.rows, success: true})
   }catch (error) {
     console.error('Error getting set data:', error);
     res.status(500).send({ success: false, message: 'Internal Server Error' });
@@ -152,9 +156,10 @@ app.post('/login', async (req, res) => {
     }
     else{
       const id = result.rows[0].id
-      const token = jwt.sign({ id }, 'secret', {
+      const token = jwt.sign({ userId: id }, 'secret', {
         expiresIn: '1h'
       })
+      console.log("Login: Token payload:", jwt.decode(token));
       res.json({
         auth: true, 
         token: token, 
@@ -176,9 +181,22 @@ app.post('/create-account', async (req, res) => {
   console.log(firstName, lastName, email, password)
 
   try {
-      const query = 'INSERT INTO users (first_name, last_name, user_email, user_pass) VALUES ($1, $2, $3, $4)';
-      await db.query(query, [firstName, lastName, email, password]);
-      res.status(201).send({success: true, message: 'User created successfully'});
+      const query = 'INSERT INTO users (first_name, last_name, user_email, user_pass) VALUES ($1, $2, $3, $4) RETURNING id';
+      const result = await db.query(query, [firstName, lastName, email, password]);
+
+      const id = result.rows[0].id
+      const token = jwt.sign({ userId: id }, 'secret', {
+        expiresIn: '1h'
+      })
+      console.log("Create Account: Token payload:", jwt.decode(token))
+      res.json({
+        auth: true, 
+        token: token, 
+        success: true,
+        userId: id,
+        message: 'User logged in successfully'
+      })
+      // res.status(201).send({success: true, message: 'User created successfully'});
   } catch (error) {
       console.error('Error inserting user:', error);
       res.status(500).send({ success: false, message: 'Internal Server Error' });

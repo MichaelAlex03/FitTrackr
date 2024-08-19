@@ -48,6 +48,11 @@ export default function CreateAccount() {
         { email: formData.email, password: formData.password, firstName: formData.firstName, lastName: formData.lastName });  
         if (response.data.success) {
           console.log('User logged in and added to database');
+          console.log(response.data.userId);
+
+          //Stores token for new user
+          localStorage.setItem('token', response.data.token)
+
           navigateToWorkout();
         } else {
           console.log('Login failed');

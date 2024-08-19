@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
@@ -8,6 +8,7 @@ interface Exercise {
     workout_sets: number;
     exercise_reps: number;
     exercise_weight: number;
+    exercise_id: number;
 }
 
 export default function WorkoutView() {
@@ -17,6 +18,8 @@ export default function WorkoutView() {
     const { id } = useParams<{ id: string }>();
     const [exercises, setExercises] = useState<Exercise[]>([]);
     const [exerciseSets, setExerciseSets] = useState<Exercise[]>([]);
+    const [totalSets, setTotalSets] = useState(0);
+
 
     useEffect(() => {
         const fetchExercises = async () => {
@@ -30,6 +33,7 @@ export default function WorkoutView() {
                         'Authorization': `Bearer ${token}`
                     }
                 });
+                console.log(response.data.success)
                 if(response.data.success)
                 {
                     const setsData = await axios.get(`http://localhost:3000/sets/${id}`, {
@@ -38,7 +42,8 @@ export default function WorkoutView() {
                         }
                     });
                     setExerciseSets(setsData.data.rows);
-                    console.log(setsData);
+                    console.log(setsData.data.rows);
+                    console.log(id)
                 }
                 setExercises(response.data.rows);
             } catch (error) {
@@ -47,12 +52,23 @@ export default function WorkoutView() {
         };
 
         fetchExercises();
-    }, []);
+    }, [totalSets]);
 
 
     const renderSets = (exercise: Exercise) => {
         const setsExercises = [];
-        for(let i = 0; i < 2; i++){
+
+        var numberOfSets:number = 0
+
+        //Goes through sets state and counts how many sets for each exercise
+        for(let i = 0; i < exerciseSets.length; i++){
+            if(exercise.id === exerciseSets[i].exercise_id){
+                numberOfSets++
+            }
+        }
+
+        //Displays sets
+        for(let i = 0; i < numberOfSets; i++){
             setsExercises.push(
                 <div key={i} className="flex items-center">
                     <label htmlFor="sets" className="mr-1">Set</label>
@@ -62,9 +78,9 @@ export default function WorkoutView() {
                     <input type="text" 
                         name="reps" 
                         className="w-10 rounded-md mr-3 pl-1" 
-                        placeholder={String(exercise.exercise_reps)}
-                        value={exercise.exercise_reps}  
-                        onChange={(e) => handleRepsChange(e, exercise.id)}
+                        placeholder={String(0)}
+                        value={0}  
+                        // onChange={(e) => handleRepsChange(e, exercise.id)}
                         key={i}
                     />
 
@@ -72,46 +88,43 @@ export default function WorkoutView() {
                     <input type="text" 
                         name="weight" 
                         className="w-10 rounded-md pl-1" 
-                        placeholder={String(exercise.exercise_weight)}
-                        value={exercise.exercise_weight}
-                        onChange={(e) => handleWeightChange(e, exercise.id)}
+                        placeholder={String(0)}
+                        value={0}  
+                        // onChange={(e) => handleWeightChange(e, exercise.id)}
                     />
 
-                    <button onClick={() => removeSet(exercise)} className="submit delete ml-auto"><img src="../images/trash.webp" alt="trash"/></button>
+                    <button className="submit delete ml-auto"><img src="../images/trash.webp" alt="trash"/></button>
                 </div>
             );
         }
         return setsExercises;
     }
 
+  console.log(exercises);
+
    const addSet = async (exercise: Exercise) => {
-        if(exercise.workout_sets == 0){
-            const token = localStorage.getItem("token")
-            if(!token){
-                return;
-            }
 
-
-        const setsResponse = await axios.post('http://localhost:3000/create_sets', {
-            exercise_id: exercise.id,
-            workout_id: id,
-            reps: 0,
-            weight: 0
-        } , {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        });
-
-        setExercises(prevExercises => prevExercises.map(ex => 
-            ex.id === exercise.id ? { ...ex, workout_sets: ex.workout_sets + 1 } : ex
-         ));
-
-        } else {
-            setExercises(prevExercises => prevExercises.map(ex => 
-            ex.id === exercise.id ? { ...ex, workout_sets: ex.workout_sets + 1 } : ex
-         ));
+        const token = localStorage.getItem("token")
+        if(!token){
+            return;
         }
+
+        try {
+            await axios.post('http://localhost:3000/create_sets', {
+                exercise_id: exercise.id,
+                workout_id: id,
+                reps: 0,
+                weight: 0
+            } , {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            setTotalSets(prevTotal => prevTotal + 1);
+            
+        } catch (error) {
+            console.error('Error adding set', error);
+        }    
     }
 
     const removeSet = (exercise: Exercise) => {
