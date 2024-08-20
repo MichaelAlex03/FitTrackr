@@ -5,6 +5,10 @@ import axios from 'axios';
 interface Exercise {
     id: number;
     exercise_name: string;
+}
+
+interface Sets{
+    id: number;
     workout_sets: number;
     exercise_reps: number;
     exercise_weight: number;
@@ -17,8 +21,7 @@ export default function WorkoutView() {
 
     const { id } = useParams<{ id: string }>();
     const [exercises, setExercises] = useState<Exercise[]>([]);
-    const [exerciseSets, setExerciseSets] = useState<Exercise[]>([]);
-    const [totalSets, setTotalSets] = useState(0);
+    const [exerciseSets, setExerciseSets] = useState<Sets[]>([]);
 
 
     useEffect(() => {
@@ -52,52 +55,36 @@ export default function WorkoutView() {
         };
 
         fetchExercises();
-    }, [totalSets]);
+    },[]);
 
 
-    const renderSets = (exercise: Exercise) => {
-        const setsExercises = [];
+    const renderSets = (sets: Sets[]) => {
+        return sets.map((set, index) => (
+            <div key={set.id} className="flex items-center">
+                <label htmlFor="sets" className="mr-1">Set</label>
+                <button name="sets" className="w-5 rounded-md bg-white font-bold p-0 mr-3">{index + 1}</button>
 
-        var numberOfSets:number = 0
+                <label htmlFor="reps" className="mr-1"> Reps </label>
+                <input type="text" 
+                    name="reps" 
+                    className="w-10 rounded-md mr-3 pl-1" 
+                    value={set.exercise_reps}  
+                    onChange={(e) => handleRepsChange(e, set.id)}
+                />
 
-        //Goes through sets state and counts how many sets for each exercise
-        for(let i = 0; i < exerciseSets.length; i++){
-            if(exercise.id === exerciseSets[i].exercise_id){
-                numberOfSets++
-            }
-        }
+                <label htmlFor="weight" className="mr-1"> Weight </label>
+                <input type="text" 
+                    name="weight" 
+                    className="w-10 rounded-md pl-1" 
+                    value={set.exercise_weight}  
+                    onChange={(e) => handleWeightChange(e, set.id)}
+                />
 
-        //Displays sets
-        for(let i = 0; i < numberOfSets; i++){
-            setsExercises.push(
-                <div key={i} className="flex items-center">
-                    <label htmlFor="sets" className="mr-1">Set</label>
-                    <button name="sets" className="w-5 rounded-md bg-white font-bold p-0 mr-3">{i + 1}</button>
-
-                    <label htmlFor="reps" className="mr-1"> Reps </label>
-                    <input type="text" 
-                        name="reps" 
-                        className="w-10 rounded-md mr-3 pl-1" 
-                        placeholder={String(0)}
-                        value={0}  
-                        // onChange={(e) => handleRepsChange(e, exercise.id)}
-                        key={i}
-                    />
-
-                    <label htmlFor="weight" className="mr-1"> Weight </label>
-                    <input type="text" 
-                        name="weight" 
-                        className="w-10 rounded-md pl-1" 
-                        placeholder={String(0)}
-                        value={0}  
-                        // onChange={(e) => handleWeightChange(e, exercise.id)}
-                    />
-
-                    <button className="submit delete ml-auto"><img src="../images/trash.webp" alt="trash"/></button>
-                </div>
-            );
-        }
-        return setsExercises;
+                <button className="submit delete ml-auto" onClick={() => removeSet(set.id)}>
+                    <img src="../images/trash.webp" alt="trash"/>
+                </button>
+            </div>
+        ));
     }
 
   console.log(exercises);
@@ -110,7 +97,7 @@ export default function WorkoutView() {
         }
 
         try {
-            await axios.post('http://localhost:3000/create_sets', {
+            const response = await axios.post('http://localhost:3000/create_sets', {
                 exercise_id: exercise.id,
                 workout_id: id,
                 reps: 0,
@@ -120,17 +107,36 @@ export default function WorkoutView() {
                     'Authorization': `Bearer ${token}`
                 }
             });
-            setTotalSets(prevTotal => prevTotal + 1);
+
+            console.log('Server response:', response.data);
+        
+            if(response.data.success){
+                setExerciseSets(prevSets => [...prevSets, response.data.newSet]);
+            }
             
         } catch (error) {
             console.error('Error adding set', error);
         }    
     }
 
-    const removeSet = (exercise: Exercise) => {
-        setExercises(prevExercises => prevExercises.map(ex => 
-            ex.id === exercise.id ? { ...ex, exercise_sets: ex.workout_sets - 1 } : ex
-        ));
+    const removeSet = async (setId: number) => {
+        const token = localStorage.getItem("token")
+        if(!token){
+            return;
+        }
+
+        try {
+            const response = await axios.delete(`http://localhost:3000/set/${setId}`);
+
+            console.log('Server response:', response.data);
+        
+            if(response.data.success){
+                setExerciseSets(prevSets => prevSets.filter(set => set.id != setId));
+            }
+            
+        } catch (error) {
+            console.error('Error adding set', error);
+        }    
     }
 
     const navigateToWorkoutPage = () => {
@@ -144,13 +150,13 @@ export default function WorkoutView() {
                 return;
             }
 
-            const exercisesData = exercises.map(exercise => ({
-                reps: exercise.exercise_reps,
-                weight: exercise.exercise_weight
-            }));
+            // const exercisesData = exercises.map(exercise => ({
+            //     reps: exercise.exercise_reps,
+            //     weight: exercise.exercise_weight
+            // }));
 
             const response = await axios.post(`http://localhost:3000/user_workouts/${id}`, {
-                exercises: exercisesData
+                // exercises: exercisesData
             }, {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -166,32 +172,38 @@ export default function WorkoutView() {
         }
     }
 
-    function handleRepsChange(e: React.ChangeEvent<HTMLInputElement>, exerciseId: number) {
+    function handleRepsChange(e: React.ChangeEvent<HTMLInputElement>, setId: number) {
         const { value } = e.target;
         console.log(e.target);
-        setExercises(prevExercises => prevExercises.map(exercise => 
-            exercise.id === exerciseId ? { ...exercise, exercise_reps: Number(value) } : exercise
+        console.log(setId)
+        setExerciseSets(prevSets => prevSets.map(set => 
+            set.id === setId ? { ...set, exercise_reps: Number(value) } : set
         ));
+        
     }
 
-    function handleWeightChange(e: React.ChangeEvent<HTMLInputElement>, exerciseId: number) {
+    function handleWeightChange(e: React.ChangeEvent<HTMLInputElement>, setId: number) {
         const { value } = e.target;
-        setExercises(prevExercises => prevExercises.map(exercise => 
-            exercise.id === exerciseId ? { ...exercise, exercise_weight: Number(value) } : exercise
+        setExerciseSets(prevSets => prevSets.map(set => 
+            set.id === setId ? { ...set, exercise_weight: Number(value) } : set
         ));
+        
     }
 
     return (
         <div className = "background">
             <div className = "content xs:w-5/6 lg:w-1/2">
                 <div className='max-h-[100vh] overflow-y-auto flex flex-col items-center'>
-                    {exercises.map((exercise) => (
-                            <div key={exercise.id} className = "mb-8 p-4 border rounded bg-gray-50 w-1/2 xs:w-5/6">
+                    {exercises.map((exercise) => {
+                        const exerciseSetsFiltered = exerciseSets.filter(set => set.exercise_id === exercise.id);
+                        return (
+                            <div key={exercise.id} className="mb-8 p-4 border rounded bg-gray-50 w-1/2 xs:w-5/6">
                                 <h2 className="text-xl font-semibold mb-4">{exercise.exercise_name}</h2>
-                                {renderSets(exercise)}
+                                {renderSets(exerciseSetsFiltered)}
                                 <button className="submit mt-4 p-1" onClick={() => addSet(exercise)}>Add Set</button>
                             </div>
-                        ))}
+                        );
+                    })}
                 </div>
                 <button className='submit mt-2' onClick={finishWorkout}>Finish Workout</button>
             </div>

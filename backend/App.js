@@ -99,8 +99,11 @@ app.get("/sets/:id", verifyJWT, async (req, res) => {
 
 app.post("/create_sets", verifyJWT, async (req, res) => {
   try{
-      db.query('INSERT INTO workout_sets (exercise_id, exercise_reps, exercise_weight, workout_id) VALUES ($1, $2, $3, $4)', 
+      const result = await db.query('INSERT INTO workout_sets (exercise_id, exercise_reps, exercise_weight, workout_id) VALUES ($1, $2, $3, $4) RETURNING *', 
         [req.body.exercise_id, req.body.reps, req.body.weight, req.body.workout_id]);
+
+        console.log('New set created:', result.rows[0]); 
+        res.status(201).json({ success: true, newSet: result.rows[0] });
   } catch(error){
     console.error('Error inserting set', error);
     res.status(500).send({ success: false, message: 'Internal Server Error' });
@@ -232,6 +235,17 @@ app.delete('/workouts/:id', async (req, res) => {
     res.status(200).send({success: true, message: 'workouts deleted'});
   }catch(error){
     console.error('Error inserting user:', error);
+    res.status(500).send({ success: false, message: 'Internal Server Error' });
+  }
+})
+
+app.delete('/set/:id', async (req, res) => {
+  const setId = req.params.id
+  try {
+    await db.query('DELETE FROM workout_sets WHERE id = $1', [setId]);
+    res.status(200).send({success: true, message: 'set deleted'});
+  } catch (error) {
+    console.error('Error deleting set:', error);
     res.status(500).send({ success: false, message: 'Internal Server Error' });
   }
 })
