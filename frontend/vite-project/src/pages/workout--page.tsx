@@ -72,9 +72,9 @@ export default function WorkoutPage() {
                 <button className=" absolute submit top-24 w-5/6" onClick={navigateToCreateWorkout}>Create a new workout</button>
                 <div className="flex flex-col items-center mt-24 w-full overflow-y-auto max-h-[450px]">
                 {workouts.map((workout) => (
-                        <div>
-                            <button key={workout.id} className="workouts" onClick={() => navigateToWorkoutView(workout.id)}>{workout.workout_name}</button>
-                            <button key={workout.workout_name} onClick={() => removeWorkout(workout)} className="submit delete"><img src="../images/trash.webp" alt="trash"/></button>
+                        <div className="flex w-5/6 mb-2 gap-2">
+                            <button key={workout.id} className="workouts flex-grow" onClick={() => navigateToWorkoutView(workout.id)}>{workout.workout_name}</button>
+                            <button key={workout.workout_name} onClick={() => removeWorkout(workout)} className="workouts delete w-12 h-12 flex items-center justify-center"><img src="../images/trash.webp" alt="trash" className='w-6 h-6'/></button>
                         </div>
                     ))}
                 </div>
