@@ -81,21 +81,6 @@ app.get("/sets/:id", verifyJWT, async (req, res) => {
   }
 })
 
-// app.post("/user_workouts/:id", verifyJWT, async (req, res) => {
-//   const workout_id = req.params.id
-//   const {exercises } = req.body;
-//   try{
-//     const insertExercises = exercises.map(exercise => {
-//       const { reps, weight } = exercise;
-//       db.query('INSERT INTO user_exercises (exercise_reps, exercise_weight, workout_id) VALUES ($1, $2, $3),'
-//       [reps, weight, workout_id]);
-//     })
-//     res.send({success: true});
-//   }catch(error){
-//     console.error('Error posting data:', error);
-//     res.status(500).send({ success: false, message: 'Internal Server Error' });
-//   }
-// })
 
 app.post("/create_sets", verifyJWT, async (req, res) => {
   try{
@@ -205,6 +190,28 @@ app.post('/create-account', async (req, res) => {
       res.status(500).send({ success: false, message: 'Internal Server Error' });
   }
 });
+
+
+app.patch("/user_sets", verifyJWT, async (req, res) => {
+
+  const {sets } = req.body;
+  try{
+    const updatePromises = sets.map(set => {
+      const { exercise_reps, exercise_weight, id } = set;
+      console.log(id);
+      return db.query(
+        'UPDATE workout_sets SET exercise_reps = $1, exercise_weight = $2 WHERE id = $3',
+        [exercise_reps, exercise_weight, id]
+      );
+    });
+
+    await Promise.all(updatePromises);
+    res.send({success: true});
+  }catch(error){
+    console.error('Error posting data:', error);
+    res.status(500).send({ success: false, message: 'Internal Server Error' });
+  }
+})
 
 app.delete('/workout_sets/:id', async (req, res) => {
   const workout_id = req.params.id;

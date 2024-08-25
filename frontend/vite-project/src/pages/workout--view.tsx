@@ -150,13 +150,10 @@ export default function WorkoutView() {
                 return;
             }
 
-            // const exercisesData = exercises.map(exercise => ({
-            //     reps: exercise.exercise_reps,
-            //     weight: exercise.exercise_weight
-            // }));
+            console.log("Sending exerciseSets:", exerciseSets); // Log the data being sent
 
-            const response = await axios.post(`http://localhost:3000/user_workouts/${id}`, {
-                // exercises: exercisesData
+            const response = await axios.patch(`http://localhost:3000/user_sets`, {
+                sets: exerciseSets
             }, {
                 headers: {
                     'Authorization': `Bearer ${token}`
