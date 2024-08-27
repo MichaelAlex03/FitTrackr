@@ -20,6 +20,10 @@ export default function WorkoutPage() {
         navigate(`/workout--view/${id}`);
     };
 
+    const navigateToWelcome = () => {
+        navigate('/')
+    }
+
     useEffect(() => {
         const fetchWorkouts = async () => {
             try {
@@ -67,7 +71,7 @@ export default function WorkoutPage() {
 
     return (
         <div className="background">
-            <div className="relative content">
+            <div className="relative content flex flex-col">
                 <h1 className="absolute top-5 left-5 text-2xl font-bold">My Workouts</h1>
                 <button className=" absolute submit top-24 w-5/6" onClick={navigateToCreateWorkout}>Create a new workout</button>
                 <div className="flex flex-col items-center mt-24 w-full overflow-y-auto max-h-[450px]">
@@ -78,6 +82,7 @@ export default function WorkoutPage() {
                         </div>
                     ))}
                 </div>
+                <button className='submit bg-gray-300 w-1/2 absolute bottom-4 left-1/2 transform -translate-x-1/2' onClick={navigateToWelcome}>Sign out</button>
             </div>
         </div>
     )

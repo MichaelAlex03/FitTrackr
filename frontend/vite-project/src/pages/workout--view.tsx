@@ -60,7 +60,7 @@ export default function WorkoutView() {
 
     const renderSets = (sets: Sets[]) => {
         return sets.map((set, index) => (
-            <div key={set.id} className="flex items-center">
+            <div key={set.id} className="flex flex-wrap items-center gap-2 mb-5">
                 <label htmlFor="sets" className="mr-1">Set</label>
                 <button name="sets" className="w-5 rounded-md bg-white font-bold p-0 mr-3">{index + 1}</button>
 
