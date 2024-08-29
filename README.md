@@ -2,4 +2,4 @@
 
 ## Overview
 
-FitTrackr is an app that is designed to provide a simple and efficient way to track workouts for anybody.
+FitTrackr is a user-friendly workout application that allows users to create, manage, and edit your workouts with ease.
