@@ -148,6 +148,7 @@ export default function CreateWorkout() {
                     <button className="submit bg-gray-300" onClick={handleAddExercise}>Add</button>
                 </div>
                 <button className="submit" onClick={handleCreateWorkout}>Create Workout</button>
+                <button className="submit" onClick={navigateToWorkoutPage}>Return to Workouts</button>
             </div>
         </div>
     )

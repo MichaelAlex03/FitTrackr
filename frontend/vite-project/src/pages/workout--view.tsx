@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState} from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
@@ -203,6 +203,7 @@ export default function WorkoutView() {
                     })}
                 </div>
                 <button className='submit mt-2' onClick={finishWorkout}>Finish Workout</button>
+                <button className="submit bg-gray-300" onClick={navigateToWorkoutPage}>Return to Workouts</button>
             </div>
         </div>
     )
