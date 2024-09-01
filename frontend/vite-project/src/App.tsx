@@ -5,6 +5,7 @@ import CreateAccount from './pages/create--account';
 import WorkoutPage from './pages/workout--page';
 import CreateWorkout from './pages/create--workout';
 import WorkoutView from './pages/workout--view';
+import ExerciseHistory from './pages/exercise-history';
 
 
 
@@ -19,6 +20,8 @@ function App() {
         <Route path="/workout" element={<div><WorkoutPage /></div>} />
         <Route path="/create-workout" element={<div><CreateWorkout /></div>} />
         <Route path="/workout--view/:id" element={<div><WorkoutView /></div>} />
+        <Route path="/workout-history/:exerciseName" element={<div><ExerciseHistory /></div>} />
+        <Route path="*" element={<div>404 - Not Found</div>} />
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </Router>

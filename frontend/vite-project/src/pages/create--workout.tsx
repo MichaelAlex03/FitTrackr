@@ -12,7 +12,6 @@ export default function CreateWorkout() {
     const navigate = useNavigate();
     const [workoutName, setWorkoutName] = useState('');
 
-    const [isOpen, setIsOpen] = useState(false);
     const [exercises, setExercises] = useState<Exercise[]>([]);
     const [selectedExercise, setSelectedExercise] = useState<string>('');
     const [selectedExercises, setSelectedExercises] = useState<string[]>([]);
@@ -33,10 +32,6 @@ export default function CreateWorkout() {
 
         fetchExercises();
     }, []);
-
-    function toggleDropdown() {
-        setIsOpen(!isOpen);
-    };
 
     function handleWorkoutChange(event: React.ChangeEvent<HTMLSelectElement>) {
         console.log(event)
@@ -121,7 +116,6 @@ export default function CreateWorkout() {
                 <div className="w-full">
             <select
                 className="submit rounded bg-gray-300"
-                onClick={toggleDropdown}
                 onChange={handleWorkoutChange}
             >
                 <option value="">---Add Exercises---</option>

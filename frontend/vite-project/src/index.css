@@ -36,4 +36,7 @@
     .bg-background{
         background-color: #b6c7aa;
     }
+    .max-height{
+        max-height: 40vh;
+    }
 }

@@ -1,6 +1,9 @@
 import { useEffect, useState} from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import Dropdown from '../components/Dropdown/Dropdown';
+import DropdownItem from '../components/DropdownItem/DropdownItem';
+
 
 interface Exercise {
     id: number;
@@ -22,6 +25,8 @@ export default function WorkoutView() {
     const { id } = useParams<{ id: string }>();
     const [exercises, setExercises] = useState<Exercise[]>([]);
     const [exerciseSets, setExerciseSets] = useState<Sets[]>([]);
+
+    const options: string[] = ["Replace Exercise", "View Exercise History"];
 
 
     useEffect(() => {
@@ -142,6 +147,13 @@ export default function WorkoutView() {
     const navigateToWorkoutPage = () => {
         navigate('/workout');
     };
+    
+    const viewExerciseHistory = (exercise: Exercise) => {
+        const exercise_name = encodeURIComponent(exercise.exercise_name);
+        console.log(exercise_name);
+        const url = `/workout-history/${exercise_name}`;
+        navigate(url);
+    }
 
     const finishWorkout = async () => {
         try{
@@ -169,6 +181,15 @@ export default function WorkoutView() {
         }
     }
 
+    const handleOptionClick = (option: string, exercise: Exercise) => {
+        if (option === "Replace Exercise") {
+            // Handle replace exercise
+        } else if (option === "View Exercise History") {
+            viewExerciseHistory(exercise);
+        }
+    };
+
+
     function handleRepsChange(e: React.ChangeEvent<HTMLInputElement>, setId: number) {
         const { value } = e.target;
         console.log(e.target);
@@ -194,8 +215,19 @@ export default function WorkoutView() {
                     {exercises.map((exercise) => {
                         const exerciseSetsFiltered = exerciseSets.filter(set => set.exercise_id === exercise.id);
                         return (
-                            <div key={exercise.id} className="mb-8 p-4 border rounded bg-gray-50 w-1/2 xs:w-5/6">
-                                <h2 className="text-xl font-semibold mb-4">{exercise.exercise_name}</h2>
+                            <div key={exercise.id} className="mb-8 p-4 border rounded bg-gray-50  xs:w-5/6">
+                                <div className='flex mb-4'>
+                                    <h2 className="text-xl font-semibold mb-4 mr-auto">{exercise.exercise_name}</h2>
+                                    <Dropdown buttonText="Dropdown button"
+                                    content = {<>
+                                        {options.map(option => (
+                                            <DropdownItem key={option} onClick={() => handleOptionClick(option, exercise)}>
+                                                {option}
+                                            </DropdownItem>
+                                         ))}
+                                    </>
+                                    }/>
+                                </div>
                                 {renderSets(exerciseSetsFiltered)}
                                 <button className="submit mt-4 p-1" onClick={() => addSet(exercise)}>Add Set</button>
                             </div>
