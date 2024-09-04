@@ -81,11 +81,27 @@ app.get("/sets/:id", verifyJWT, async (req, res) => {
   }
 })
 
+app.get("/exercise_history/:id/:exercise_name", verifyJWT, async(req, res) => {
+  const userId = req.userId
+
+  const exercise_name = req.params.exercise_name;
+
+  try{
+    const result = await db.query('SELECT * FROM workout_sets WHERE exercise_name = $1 AND user_id = $2', [exercise_name, userId]);
+    res.json({result: result.rows, success: true});
+  }catch (error) {
+    console.error('Error getting exercise history:', error);
+    res.status(500).send({ success: false, message: 'Internal Server Error' });
+  }
+})
 
 app.post("/create_sets", verifyJWT, async (req, res) => {
+  
+  const userId = req.userId
+
   try{
-      const result = await db.query('INSERT INTO workout_sets (exercise_id, exercise_reps, exercise_weight, workout_id) VALUES ($1, $2, $3, $4) RETURNING *', 
-        [req.body.exercise_id, req.body.reps, req.body.weight, req.body.workout_id]);
+      const result = await db.query('INSERT INTO workout_sets (exercise_id, exercise_reps, exercise_weight, workout_id, exercise_name, user_id) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *', 
+        [req.body.exercise_id, req.body.reps, req.body.weight, req.body.workout_id, req.body.exercise_name, userId]);
 
         console.log('New set created:', result.rows[0]); 
         res.status(201).json({ success: true, newSet: result.rows[0] });

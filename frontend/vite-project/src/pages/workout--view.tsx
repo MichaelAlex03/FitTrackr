@@ -85,7 +85,7 @@ export default function WorkoutView() {
                     onChange={(e) => handleWeightChange(e, set.id)}
                 />
 
-                <button className="submit delete ml-auto" onClick={() => removeSet(set.id)}>
+                <button className="submit delete ml-auto hover:bg-blue-600" onClick={() => removeSet(set.id)}>
                     <img src="../images/trash.webp" alt="trash"/>
                 </button>
             </div>
@@ -103,6 +103,7 @@ export default function WorkoutView() {
 
         try {
             const response = await axios.post('http://localhost:3000/create_sets', {
+                exercise_name: exercise.exercise_name,
                 exercise_id: exercise.id,
                 workout_id: id,
                 reps: 0,
@@ -151,7 +152,7 @@ export default function WorkoutView() {
     const viewExerciseHistory = (exercise: Exercise) => {
         const exercise_name = encodeURIComponent(exercise.exercise_name);
         console.log(exercise_name);
-        const url = `/workout-history/${exercise_name}`;
+        const url = `/workout-history/${id}/${exercise_name}`;
         navigate(url);
     }
 
