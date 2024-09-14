@@ -273,6 +273,18 @@ app.delete('/set/:id', async (req, res) => {
   }
 })
 
+app.delete('/user_exercises/:id', async (req, res) => {
+  const exerciseId = req.params.id;
+  try{
+    await db.query('DELETE FROM user_exercises WHERE id = $1' , [exerciseId]);
+    res.status(200).send({success: true, message: 'exercises deleted'});
+  }catch(error){
+    console.error('Error inserting user:', error);
+    res.status(500).send({ success: false, message: 'Internal Server Error' });
+  }
+})
+
+
 app.listen(port, () => {
     console.log(`Server running on http://localhost:${port}`);
   });

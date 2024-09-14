@@ -39,13 +39,19 @@ function ExerciseHistory() {
 
   return (
     <div className='background'>
-        <div className='content'>
-            {exerciseHistory.map((exercise) => (
-              <div key={exercise.id} className='flex '>
-                <p>{exercise.exercise_reps}</p>
-                <p>{exercise.exercise_weight}</p>
-              </div>
-            ))}
+        <div className='absolute top-10'>
+            <h1  className='text-3xl font-bold mb-2 text'>Previous Sets for {exerciseName}</h1>
+            <div className='bg-white rounded-lg'>
+              <ul className='divide-y divide-gray-200'>
+              {exerciseHistory.map((exercise) => (
+                <div key={exercise.id} className='flex justify-between rounded-md p-5'>
+                  <p className=''>Reps: {exercise.exercise_reps}</p>
+                  <p>Weight: {exercise.exercise_weight}</p>
+                </div>
+              ))}
+              </ul>
+            </div>
+            
         </div>
     </div>
   )

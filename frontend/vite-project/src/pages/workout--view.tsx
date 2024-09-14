@@ -18,6 +18,11 @@ interface Sets{
     exercise_id: number;
 }
 
+interface Workout {
+    id: number;
+    exercise_name: string;
+}
+
 export default function WorkoutView() {
 
     const navigate = useNavigate();
@@ -25,8 +30,10 @@ export default function WorkoutView() {
     const { id } = useParams<{ id: string }>();
     const [exercises, setExercises] = useState<Exercise[]>([]);
     const [exerciseSets, setExerciseSets] = useState<Sets[]>([]);
+    const [workouts, setWorkouts] = useState<Workout[]>([]);
+    const [toggleAddExercise, setToggleAddExercise] = useState(false);
 
-    const options: string[] = ["Replace Exercise", "View Exercise History"];
+    const options: string[] = ["Delete Exercise", "View Exercise History"];
 
 
     useEffect(() => {
@@ -61,6 +68,20 @@ export default function WorkoutView() {
 
         fetchExercises();
     },[]);
+
+    useEffect(() => {
+        const fetchWorkouts = async () => {
+            try {
+                const response = await axios.get('http://localhost:3000/exercises');
+                setWorkouts(response.data)
+            } catch (error) {
+                console.error('Error fetching exercises:', error);
+            }
+        };
+
+        fetchWorkouts();
+    
+    },[toggleAddExercise])
 
 
     const renderSets = (sets: Sets[]) => {
@@ -182,12 +203,26 @@ export default function WorkoutView() {
         }
     }
 
-    const handleOptionClick = (option: string, exercise: Exercise) => {
-        if (option === "Replace Exercise") {
-            // Handle replace exercise
+    const handleOptionClick = async (option: string, exercise: Exercise) => {
+        if (option === "Delete Exercise") {
+            try{
+                await axios.delete(`http://localhost:3000/user_exercises/${exercise.id}`);
+            } catch (error) {
+                console.error('Error deleting exercise:', error);
+            }
+            setExercises(prevExercises => prevExercises.filter(ex => ex != exercise));
         } else if (option === "View Exercise History") {
             viewExerciseHistory(exercise);
         }
+    };
+
+    const toggleAdd = () => {
+        setToggleAddExercise(prevToggle => !prevToggle);
+        console.log(workouts);
+    };
+
+    const addExercise = (exercise: Exercise) => {
+        setExercises(prevExercises => [...prevExercises, exercise])
     };
 
 
@@ -219,7 +254,7 @@ export default function WorkoutView() {
                             <div key={exercise.id} className="mb-8 p-4 border rounded bg-gray-50  xs:w-5/6">
                                 <div className='flex mb-4'>
                                     <h2 className="text-xl font-semibold mb-4 mr-auto">{exercise.exercise_name}</h2>
-                                    <Dropdown buttonText="Dropdown button"
+                                    <Dropdown buttonText="..."
                                     content = {<>
                                         {options.map(option => (
                                             <DropdownItem key={option} onClick={() => handleOptionClick(option, exercise)}>
@@ -235,7 +270,13 @@ export default function WorkoutView() {
                         );
                     })}
                 </div>
-                <button className='submit mt-2' onClick={finishWorkout}>Finish Workout</button>
+                <button className='submit mt-2' onClick={toggleAdd}>Add Exercise</button>
+                <select className="submit rounded bg-gray-300">
+                    {toggleAddExercise && workouts.map((workout: Workout) => (
+                        <option key={workout.id} onClick={() => addExercise(workout)}>{workout.exercise_name}</option>
+                    ))}
+                </select>
+                <button className='submit bg-background' onClick={finishWorkout}>Finish Workout</button>
                 <button className="submit bg-gray-300" onClick={navigateToWorkoutPage}>Return to Workouts</button>
             </div>
         </div>
