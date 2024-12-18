@@ -1,21 +1,10 @@
 import express from "express";
 import bodyParser from "body-parser";
-import pg from "pg";
 import cors from "cors";
 import jwt from "jsonwebtoken";
 
 const app = express();
-const port = 3000;
 
-const db = new pg.Client({
-    user: "postgres",
-    host: "localhost",
-    database: "users--workout",
-    password: "Alexander03",
-    port: 5433,
-  });
-
-db.connect();
 
 app.use(bodyParser.json());
 app.use(cors());
