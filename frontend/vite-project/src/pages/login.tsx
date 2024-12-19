@@ -7,7 +7,7 @@ export default function Login() {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
-  })
+  });
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
@@ -25,6 +25,7 @@ export default function Login() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try{
+      console.log(formData)
       const response = await axios.post('http://localhost:3000/login', formData);
       console.log(response.data)
       if (response.data.auth) {
