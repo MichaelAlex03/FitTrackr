@@ -58,14 +58,28 @@ export default function Register() {
       return;
     }
     try {
-      const response = await axios.post('http://localhost:3000/create-account', )
-
+      const response = await axios.post('http://localhost:3000/create-account',
+        JSON.stringify({
+          firstName: user,
+          password: pwd,
+        }),
+        {
+          headers: { 'Content-Type': 'application/json' },
+          withCredentials: true
+        }
+      );
+      console.log(response.data);
       setUser('');
       setPwd('');
       setMatchPwd('');
-
-    } catch (err) {
-
+    } catch (err: any) {
+        if (!err?.response) {
+          setErrMsg('No Server Response');
+        } else if (err.response?.status === 409) {
+          setErrMsg('Username Taken');
+        } else {
+          setErrMsg('Registration Failed');
+        }
     }
 
 
@@ -73,10 +87,9 @@ export default function Register() {
 
   return (
     <section className="w-full flex flex-col p-4 items-center justify-center h-screen bg-[#1e90ff] font-sans text-sm">
-
-      <p className={errMsg ? "errmsg" : "offscreen"} aria-live="assertive">{errMsg}</p>
-
       <form className='flex flex-col justify-evenly w-full max-w-sm bg-black bg-opacity-40 text-white p-5' onSubmit={handleSubmit}>
+
+        {errMsg && <p className='bg-pink-300 font-semibold p-2 mb-2 text-red-700' aria-live="assertive">{errMsg}</p>}
         <h1 className='font-semibold text-2xl mb-5'>Register</h1>
         <label htmlFor='username'>
           Username:
