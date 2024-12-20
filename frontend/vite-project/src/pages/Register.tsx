@@ -22,6 +22,7 @@ export default function Register() {
   const [matchFocus, setMatchFocus] = useState(false);
 
   const [errMsg, setErrMsg] = useState('');
+  const [disabled, setDisabled] = useState(true)
 
   useEffect(() => {
     const result = USER_REGEX.test(user);
@@ -86,12 +87,12 @@ export default function Register() {
   }
 
   return (
-    <section className="w-full flex flex-col p-4 items-center justify-center h-screen bg-[#1e90ff] font-sans text-sm">
+    <section className="w-full flex flex-col p-4 items-center justify-center h-screen bg-[#1e90ff] font-sans text-md">
       <form className='flex flex-col justify-evenly w-full max-w-sm bg-black bg-opacity-40 text-white p-5' onSubmit={handleSubmit}>
 
         {errMsg && <p className='bg-pink-300 font-semibold p-2 mb-2 text-red-700' aria-live="assertive">{errMsg}</p>}
         <h1 className='font-semibold text-2xl mb-5'>Register</h1>
-        <label htmlFor='username'>
+        <label htmlFor='username' className='text-lg'>
           Username:
           {user && (
             <span className='text-lg font-bold ml-1'>
@@ -103,7 +104,7 @@ export default function Register() {
           )}
         </label>
         <input
-          className='text-black rounded-md'
+          className='text-black rounded-md pl-1'
           type='text'
           id='username'
           autoComplete='off'
@@ -123,7 +124,7 @@ export default function Register() {
         </p>}
 
 
-        <label htmlFor="password">
+        <label htmlFor="password" className='text-lg'>
           Password:
           {pwd && (
             <span className='text-lg font-bold ml-1'>
@@ -136,7 +137,7 @@ export default function Register() {
 
         </label>
         <input
-          className='text-black mb-1 rounded-md'
+          className='text-black mb-1 rounded-md pl-1'
           type="password"
           id="password"
           onChange={(e) => setPwd(e.target.value)}
@@ -160,7 +161,7 @@ export default function Register() {
         </p>}
 
 
-        <label htmlFor="confirm_pwd">
+        <label htmlFor="confirm_pwd" className='text-lg'>
           Confirm Password:
           {matchPwd && (
             <span className='text-lg font-bold ml-1'>
@@ -172,7 +173,7 @@ export default function Register() {
           )}
         </label>
         <input
-          className='text-black mb-1 rounded-md'
+          className='text-black mb-1 rounded-md pl-1'
           type="password"
           id="confirm_pwd"
           onChange={(e) => setMatchPwd(e.target.value)}
@@ -188,9 +189,15 @@ export default function Register() {
           Must match the first password input field.
         </p>}
 
-        <button disabled={!validName || !validPwd || !validMatch ? true : false}>Sign Up</button>
+        <button 
+          disabled={!validName || !validPwd || !validMatch ? true : false} 
+          className={validName && validPwd && validMatch 
+            ? 'bg-white text-black font-medium py-2 rounded-lg w-full mt-4 mb-2' 
+            : 'opacity-40 bg-white text-black font-medium py-2 rounded-lg w-full mt-4 mb-2'}>
+            Sign Up
+        </button>
 
-        <p>
+        <p className='text-md'>
           Already registered?<br />
           <span className="underline">
             <a href="/Login">Sign In</a>
