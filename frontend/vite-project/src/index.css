@@ -13,7 +13,7 @@
         @apply bg-white p-4 rounded-md shadow-2xl justify-center items-center flex flex-col xs:w-3/4 sm:w-1/2 md:w-3/5 lg:w-1/2 xl:w-1/4 2xl:w-1/2 xs:h-4/5 sm:h-4/5 md:h-3/4 lg:h-1/2 xl:h-1/2 2xl:h-4/5;
     }
     .background{
-        @apply flex flex-col items-center justify-center h-screen bg-background;
+        @apply w-full flex flex-col p-4 items-center justify-start h-screen bg-background;
     }
     .submit{
         @apply bg-brownish hover:bg-blue-600 text-gray-700 font-medium py-2 px-4 rounded w-full mb-2 ;
