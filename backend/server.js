@@ -26,6 +26,24 @@ app.use(cors(corsOptions));
 //serve static files
 app.use(express.static(path.join(__dirname, 'public')));
 
+//server front end through backend will build frontend and place here in backend
+// app.get('/', (req, res) => {
+//   res.sendFile(path.join(__dirname, '..', 'public', 'index.html'));
+// });
+
+// //put auth routes here before verifyJWT
+// app.use('/auth/register', require('./routes/auth/register'));
+// app.use('/auth/login', require('./routes/auth/login'));
+// app.use('/auth/refresh', require('./routes/auth/refresh'));
+// app.use('/auth/logout', require('./routes/auth/logout'));
+
+// app.use(verifyJWT);
+
+//put all api routes after verifyJWT
+
+
+
+
 app.get("/exercises", async (req, res) => {
     const result = await pool.query('SELECT * FROM exercises')
     res.json(result.rows)
@@ -168,30 +186,17 @@ app.post('/login', async (req, res) => {
 
 
 app.post('/create-account', async (req, res) => {
-  const { firstName, lastName, email, password } = req.body;
+  const { firstName, password } = req.body;
   
-  console.log(firstName, lastName, email, password)
+  console.log(firstName, password)
 
   try {
-      const query = 'INSERT INTO users (first_name, last_name, user_email, user_pass) VALUES ($1, $2, $3, $4) RETURNING id';
-      const result = await pool.query(query, [firstName, lastName, email, password]);
-
-      const id = result.rows[0].id
-      const token = jwt.sign({ userId: id }, 'secret', {
-        expiresIn: '1h'
-      })
-      console.log("Create Account: Token payload:", jwt.decode(token))
-      res.json({
-        auth: true, 
-        token: token, 
-        success: true,
-        userId: id,
-        message: 'User logged in successfully'
-      })
-      // res.status(201).send({success: true, message: 'User created successfully'});
+      const query = 'INSERT INTO users (first_name, last_name, user_email, user_pass) VALUES ($1, $2) RETURNING id';
+      const result = await pool.query(query, [firstName, password]);
+      res.status(201).json({success: true, message: 'User created successfully'});
   } catch (error) {
       console.error('Error inserting user:', error);
-      res.status(500).send({ success: false, message: 'Internal Server Error' });
+      res.status(500).json({ success: false, message: 'Internal Server Error' });
   }
 });
 
@@ -272,10 +277,6 @@ app.delete('/user_exercises/:id', async (req, res) => {
   }
 })
 
-//server front end through backend
-app.get('/*', (req, res) => {
-  res.sendFile(path.join(__dirname, '..', 'public', 'index.html'));
-});
 
 
 app.listen(PORT, () => {

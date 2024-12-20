@@ -104,7 +104,7 @@ export default function Register() {
           )}
         </label>
         <input
-          className='text-black rounded-md pl-1'
+          className='text-black rounded-md pl-1 py-1.5'
           type='text'
           id='username'
           autoComplete='off'
@@ -137,7 +137,7 @@ export default function Register() {
 
         </label>
         <input
-          className='text-black mb-1 rounded-md pl-1'
+          className='text-black mb-1 rounded-md pl-1 py-1.5'
           type="password"
           id="password"
           onChange={(e) => setPwd(e.target.value)}
@@ -173,7 +173,7 @@ export default function Register() {
           )}
         </label>
         <input
-          className='text-black mb-1 rounded-md pl-1'
+          className='text-black mb-1 rounded-md pl-1 py-1.5' 
           type="password"
           id="confirm_pwd"
           onChange={(e) => setMatchPwd(e.target.value)}
