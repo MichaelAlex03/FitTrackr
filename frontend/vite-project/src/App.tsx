@@ -1,5 +1,5 @@
 import { Route, Routes, BrowserRouter as Router, Navigate } from 'react-router-dom';
-import Login from './pages/login'
+import Login from './pages/Login'
 import Welcome from './pages/welcome';
 import Register from './pages/Register';
 import WorkoutPage from './pages/workout--page';
@@ -16,7 +16,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Welcome />} />
         <Route path="/login" element={<div><Login /></div>} />
-        <Route path="/create-account" element={<div><Register /></div>} />
+        <Route path="/register" element={<div><Register /></div>} />
         <Route path="/workout" element={<div><WorkoutPage /></div>} />
         <Route path="/create-workout" element={<div><CreateWorkout /></div>} />
         <Route path="/workout--view/:id" element={<div><WorkoutView /></div>} />

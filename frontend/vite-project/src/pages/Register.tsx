@@ -22,7 +22,6 @@ export default function Register() {
   const [matchFocus, setMatchFocus] = useState(false);
 
   const [errMsg, setErrMsg] = useState('');
-  const [success, setSuccess] = useState(false);
 
   useEffect(() => {
     const result = USER_REGEX.test(user);
@@ -39,61 +38,46 @@ export default function Register() {
   }, [user, pwd, matchPwd])
 
 
-  async function checkEmailExists(email: string) {
-    try {
-      const response = await axios.get(`http://localhost:3000/check-email?email=${email}`);
-      return response.data.exists;
-    } catch (error) {
-      console.error('Error checking email:', error);
-      return false;
-    }
-  }
-
-  // async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-  //   e.preventDefault()
-  //   if (formData.password === formData.confirmPass) {
-  //     const emailExists = await checkEmailExists(formData.email);
-  //     if (emailExists) {
-  //       alert('Email already exists!');
-  //       return;
-  //     }
-  //     console.log('Passwords match! Logged in');
-  //     try {
-  //       const response = await axios.post('http://localhost:3000/create-account',
-  //         { email: formData.email, password: formData.password, firstName: formData.firstName, lastName: formData.lastName });
-  //       if (response.data.success) {
-  //         console.log('User logged in and added to database');
-  //         console.log(response.data.userId);
-
-  //         //Stores token for new user
-  //         localStorage.setItem('token', response.data.token)
-
-  //         navigateToWorkout();
-  //       } else {
-  //         console.log('Login failed');
-  //       }
-  //       console.log(response.data.success)
-  //     } catch (error) {
-  //       console.error('Error logging in:', error);
-  //     }
-  //   } else {
-  //     alert('Passwords do not match!');
+  // async function checkEmailExists(email: string) {
+  //   try {
+  //     const response = await axios.get(`http://localhost:3000/check-email?email=${email}`);
+  //     return response.data.exists;
+  //   } catch (error) {
+  //     console.error('Error checking email:', error);
+  //     return false;
   //   }
   // }
 
-  const navigate = useNavigate();
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    // if button enabled with JS hack
+    const v1 = USER_REGEX.test(user);
+    const v2 = PWD_REGEX.test(pwd);
+    if (!v1 || !v2) {
+      setErrMsg("Invalid Entry");
+      return;
+    }
+    try {
+      const response = await axios.post('http://localhost:3000/create-account', )
 
-  const navigateToWorkout = () => {
-    navigate('/workout');
-  };
+      setUser('');
+      setPwd('');
+      setMatchPwd('');
+
+    } catch (err) {
+
+    }
+
+
+  }
 
   return (
-    <section className="w-full min-h-full flex flex-col p-4 items-center justify-center h-screen bg-[#1e90ff] font-sans text-sm">
+    <section className="w-full flex flex-col p-4 items-center justify-center h-screen bg-[#1e90ff] font-sans text-sm">
 
       <p className={errMsg ? "errmsg" : "offscreen"} aria-live="assertive">{errMsg}</p>
 
-      <form className='flex flex-col justify-evenly w-full max-w-sm bg-black bg-opacity-40 text-white p-5'>
-        <h1 className='text-center'>Register</h1>
+      <form className='flex flex-col justify-evenly w-full max-w-sm bg-black bg-opacity-40 text-white p-5' onSubmit={handleSubmit}>
+        <h1 className='font-semibold text-2xl mb-5'>Register</h1>
         <label htmlFor='username'>
           Username:
           {user && (
@@ -162,11 +146,11 @@ export default function Register() {
           Confirm Password:
           {matchPwd && (
             <span className='text-lg font-bold ml-1'>
-              <FontAwesomeIcon 
-                icon={validMatch ? faCheck : faTimes} 
+              <FontAwesomeIcon
+                icon={validMatch ? faCheck : faTimes}
                 color={validMatch ? 'green' : 'red'}
-              /> 
-            </span> 
+              />
+            </span>
           )}
         </label>
         <input
@@ -181,12 +165,19 @@ export default function Register() {
           onFocus={() => setMatchFocus(true)}
           onBlur={() => setMatchFocus(false)}
         />
-        {matchFocus && !validMatch && <p id="confirmnote">
-          <FontAwesomeIcon icon={faInfoCircle} />
+        {matchFocus && !validMatch && <p id="confirmnote" className='bg-black p-2 rounded-md mt-1'>
+          <FontAwesomeIcon icon={faInfoCircle} className='mr-1' />
           Must match the first password input field.
         </p>}
 
+        <button disabled={!validName || !validPwd || !validMatch ? true : false}>Sign Up</button>
 
+        <p>
+          Already registered?<br />
+          <span className="underline">
+            <a href="/Login">Sign In</a>
+          </span>
+        </p>
       </form>
     </section>
   )

@@ -9,7 +9,7 @@ const navigateToLogin = () => {
 };
 
 const navigateToCreateAccount = () => {
-    navigate('/create-account');
+    navigate('/register');
 };
 
 return (
